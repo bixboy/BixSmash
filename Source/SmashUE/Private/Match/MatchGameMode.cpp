@@ -12,6 +12,7 @@ void AMatchGameMode::BeginPlay()
 	Super::BeginPlay();
 	TArray<AArenaPlayerStart*> PlayerStartsPoints;
 	FindPlayerStartActorsInArena(PlayerStartsPoints);
+	SpawnCharacters(PlayerStartsPoints);
 
 	for(AArenaPlayerStart* PlayerStartPoint : PlayerStartsPoints)
 	{
@@ -54,7 +55,7 @@ void AMatchGameMode::SpawnCharacters(const TArray<AArenaPlayerStart*>& SpawnPoin
 			SpawnPoint->GetTransform()
 			);
 
-		if (NewCharacter != nullptr) continue;
+		if (NewCharacter == nullptr) continue;
 		NewCharacter->AutoPossessPlayer = SpawnPoint->AutoReceiveInput;
 		NewCharacter->SetOrientX(SpawnPoint->GetStartOrientX());
 		NewCharacter->FinishSpawning(SpawnPoint->GetTransform());

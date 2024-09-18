@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Animation/AnimMontage.h" 
 #include "SmashCharacter.generated.h"
 
+class USmashCharacterInputData;
+class UInputMappingContext;
 class USmashCharacterStateMachine;
 
 UCLASS()
@@ -54,10 +57,28 @@ public:
 
 	void InitStateMachine();
 
+	void TickStateMachine(float DeltaTime) const;
+
+	void Move(float Speed);
+	
 protected:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<USmashCharacterStateMachine> StateMachine;
 	
+#pragma endregion
+
+#pragma region Input Data / Mapping Context
+
+public:
+	UPROPERTY()
+	TObjectPtr<UInputMappingContext> InputMappingContext;
+
+	UPROPERTY()
+	TObjectPtr<USmashCharacterInputData> InputData;
+
+protected:
+	void SetupMappingContexInToController() const;
+
 #pragma endregion	
 	
 };
