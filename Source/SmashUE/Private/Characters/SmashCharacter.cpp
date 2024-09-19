@@ -1,11 +1,13 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿	// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Characters/SmashCharacter.h"
 
 #include "Characters/SmashCharacterStateMachine.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Characters/SmashCharacterInputData.h"
+#include "EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -37,7 +39,12 @@ void ASmashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	SetupMappingContexInToController();
+	SetupMappingContextInToController();
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent == nullptr) return;
+
+	BindInputMoveXAxisAndActions(EnhancedInputComponent);
 }
 
 float ASmashCharacter::GetOrientX() const
@@ -74,13 +81,13 @@ void ASmashCharacter::TickStateMachine(float DeltaTime) const
 	StateMachine->Tick(DeltaTime);
 }
 
-void ASmashCharacter::Move(float Speed)
+void ASmashCharacter::Move(float Speed, float Orient)
 {
 	GetCharacterMovement()-> MaxWalkSpeed = Speed;
-	AddMovementInput(GetActorForwardVector(), 1);
+	AddMovementInput(GetActorForwardVector(), Orient);
 }
 
-void ASmashCharacter::SetupMappingContexInToController() const
+void ASmashCharacter::SetupMappingContextInToController() const
 {
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController == nullptr) return;
@@ -89,6 +96,46 @@ void ASmashCharacter::SetupMappingContexInToController() const
 	if (Player == nullptr) return;
 
 	UEnhancedInputLocalPlayerSubsystem* InputSystem = Player->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	if (InputSystem == nullptr) return;
 
 	InputSystem->AddMappingContext(InputMappingContext, 0);
 }
+
+	float ASmashCharacter::GetInputMoveX() const
+	{
+		return InputMoveX;
+	}
+
+	void ASmashCharacter::BindInputMoveXAxisAndActions(UEnhancedInputComponent* EnhancedInputComponent)
+	{
+		if(InputComponent == nullptr) return;
+
+		if (InputData->InputActionMoveX)
+		{
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionMoveX,
+				ETriggerEvent::Started,
+				this,
+				&ASmashCharacter::OnInputMoveX
+				);
+
+				EnhancedInputComponent->BindAction(
+					InputData->InputActionMoveX,
+					ETriggerEvent::Completed,
+					this,
+					&ASmashCharacter::OnInputMoveX
+				);
+			
+				EnhancedInputComponent->BindAction(
+					InputData->InputActionMoveX,
+					ETriggerEvent::Triggered,
+					this,
+					&ASmashCharacter::OnInputMoveX
+				);
+		}
+	}
+
+	void ASmashCharacter::OnInputMoveX(const FInputActionValue& InputActionValue)
+	{
+		InputMoveX = InputActionValue.Get<float>();
+	}

@@ -4,6 +4,7 @@
 #include "Characters/SmashCharacterStateRun.h"
 
 #include "Characters/SmashCharacter.h"
+#include "Characters/SmashCharacterStateMachine.h"
 
 
 ESmashCharacterStateID USmashCharacterStateRun::GetStateID()
@@ -23,15 +24,6 @@ void USmashCharacterStateRun::StateEnter(ESmashCharacterStateID PreviousStateID)
 void USmashCharacterStateRun::StateExit(ESmashCharacterStateID NextStateID)
 {
 	Super::StateExit(NextStateID);
-	
-	Super::StateExit(NextStateID);
-
-	GEngine->AddOnScreenDebugMessage(
-	-1,
-	3.f,
-	FColor::Red,
-	TEXT("Exit StateWalk")
-	);
 }
 
 void USmashCharacterStateRun::StateTick(float DeltaTime)
@@ -40,6 +32,14 @@ void USmashCharacterStateRun::StateTick(float DeltaTime)
 
 	Super::StateTick(DeltaTime);
 
-	Character->Move(MoveSpeed);
+	if (FMath::Abs(Character->GetInputMoveX()) < 0.1f)
+	{
+		StateMachine->ChangeState(ESmashCharacterStateID::Idle);
+	}
+	else
+	{
+		Character->SetOrientX(Character->GetInputMoveX());
+		Character->Move(MoveSpeed, Character->GetOrientX());
+	}
 }
 

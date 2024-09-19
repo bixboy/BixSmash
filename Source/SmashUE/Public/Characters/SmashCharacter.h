@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "Animation/AnimMontage.h" 
+#include "GameFramework/Character.h"
 #include "SmashCharacter.generated.h"
 
+struct FInputActionValue;
 class USmashCharacterInputData;
 class UInputMappingContext;
 class USmashCharacterStateMachine;
@@ -59,7 +60,7 @@ public:
 
 	void TickStateMachine(float DeltaTime) const;
 
-	void Move(float Speed);
+	void Move(float Speed, float Orient);
 	
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -77,9 +78,24 @@ public:
 	TObjectPtr<USmashCharacterInputData> InputData;
 
 protected:
-	void SetupMappingContexInToController() const;
+	void SetupMappingContextInToController() const;
 
 #pragma endregion	
+
+#pragma region Input Move X
+
+public:
+	float GetInputMoveX() const;
+
+protected:
+	UPROPERTY()
+	float InputMoveX = 0.f;
+
+private:
+	void BindInputMoveXAxisAndActions(UEnhancedInputComponent* EnhancedInputComponent);
+
+	void OnInputMoveX(const FInputActionValue& InputActionValue);
 	
+#pragma endregion	
 };
 

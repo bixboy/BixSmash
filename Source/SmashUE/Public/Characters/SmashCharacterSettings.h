@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EnhancedPlayerInput.h"
 #include "Engine/DeveloperSettings.h"
 #include "SmashCharacterSettings.generated.h"
 
+class UInputMappingContext;
 class USmashCharacterInputData;
 /**
  * 
@@ -18,8 +18,11 @@ class SMASHUE_API USmashCharacterSettings : public UDeveloperSettings
 
 public:
 	UPROPERTY(Config, EditAnywhere, Category="Inputs")
-	TSubclassOf<USmashCharacterInputData> InputData;
+	TSoftObjectPtr<USmashCharacterInputData> InputData;
 
 	UPROPERTY(Config, EditAnywhere, Category="Inputs")
-	TSubclassOf<UInputMappingContext> InputMappingContex;
+	TSoftObjectPtr<UInputMappingContext> InputMappingContext;
+
+	UPROPERTY(Config, EditAnywhere, Category="Inputs")
+	float InputThreshold = 0.1f;
 };
