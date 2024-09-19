@@ -28,6 +28,8 @@ public:
 	virtual void StateExit(ESmashCharacterStateID NextStateID);
 
 	virtual void StateTick(float DeltaTime);
+
+	float GetInputThreshold() const;
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAnimMontage> AnimMontage;
@@ -38,6 +40,5 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<USmashCharacterStateMachine> StateMachine;
-	
 	
 };

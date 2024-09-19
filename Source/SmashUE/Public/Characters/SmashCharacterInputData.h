@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputAction.h"
 #include "Engine/DataAsset.h"
 #include "SmashCharacterInputData.generated.h"
 
+class UInputAction;
 /**
  * 
  */
@@ -18,4 +18,7 @@ class SMASHUE_API USmashCharacterInputData : public UDataAsset
 public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UInputAction> InputActionMoveX;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UInputAction> InputActionMoveXFast;
 };

@@ -3,6 +3,7 @@
 
 #include "Characters/SmashCharacterState.h"
 
+#include "Characters/SmashCharacterSettings.h"
 #include "Characters/SmashCharacterStateMachine.h"
 
 
@@ -43,6 +44,15 @@ void USmashCharacterState::StateExit(ESmashCharacterStateID NextStateID)
 
 void USmashCharacterState::StateTick(float DeltaTime)
 {
+}
+
+float USmashCharacterState::GetInputThreshold() const
+{
+	if (const USmashCharacterSettings* Settings = GetDefault<USmashCharacterSettings>())
+	{
+		return Settings->InputThreshold;
+	}
+	return 0.1f;
 }
 
 
