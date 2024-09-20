@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SmashCharacterState.h"
-#include "SmashCharacterStateJump.generated.h"
+#include "Characters/SmashCharacterState.h"
+#include "SmashCharacterStateFall.generated.h"
 
 
 UCLASS(ClassGroup=(SmashCharacterState), meta=(BlueprintSpawnableComponent))
-class SMASHUE_API USmashCharacterStateJump : public USmashCharacterState
+class SMASHUE_API USmashCharacterStateFall : public USmashCharacterState
 {
 	GENERATED_BODY()
 
@@ -21,15 +21,16 @@ public:
 
 	virtual void StateTick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, Category = "Jump")
-	float JumpWalkSpeed = 400.f;
+	UPROPERTY(EditAnywhere, Category = "Fall")
+	float FallHorizontalMoveSpeed = 400.f;
 
-	UPROPERTY(EditAnywhere, Category = "Jump")
-	float JumpMaxHeight = 280.f;
+	UPROPERTY(EditAnywhere, Category = "Fall")
+	float FallAirControl = 1.f;
 
-	UPROPERTY(EditAnywhere, Category = "Jump")
-	float JumpDuration = 1.f;
+	UPROPERTY(EditAnywhere, Category = "Fall")
+	float FallGravityScale = 3.f;
 
-	UPROPERTY(EditAnywhere, Category = "Jump")
-	float JumpAirControl = 1.f;
+	UPROPERTY(EditAnywhere, Category = "Fall")
+	float FallFastGravityScale = 10.f;
+
 };

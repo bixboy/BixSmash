@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Characters/SmashCharacterStateJump.h"
+#include "Characters/States/Movements/SmashCharacterStateJump.h"
 
 #include "Characters/SmashCharacter.h"
 #include "Characters/SmashCharacterState.h"

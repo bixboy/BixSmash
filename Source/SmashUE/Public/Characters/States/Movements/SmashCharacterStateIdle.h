@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SmashCharacterState.h"
+#include "Characters/SmashCharacterState.h"
 #include "SmashCharacterStateIdle.generated.h"
-
 
 UCLASS(ClassGroup=(SmashCharacterState), meta=(BlueprintSpawnableComponent))
 class SMASHUE_API USmashCharacterStateIdle : public USmashCharacterState

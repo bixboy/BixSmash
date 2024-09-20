@@ -184,13 +184,23 @@ void ASmashCharacter::SetupMappingContextInToController() const
 				&ASmashCharacter::OnInputJump
 			);
 		}
+
+		if (InputData->InputActionAttack)
+		{
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionAttack,
+				ETriggerEvent::Started,
+				this,
+				&ASmashCharacter::OnInputAttack
+			);
+		}
 	}
 
 #pragma region MovementInput
 
 	void ASmashCharacter::OnInputMoveX(const FInputActionValue& InputActionValue)
 	{
-		InputMoveX = InputActionValue.Get<float>();
+		InputMoveX = InputActionValue.Get<float>();	
 	}
 
 	void ASmashCharacter::OnInputMoveXFast(const FInputActionValue& InputActionValue)
@@ -215,8 +225,9 @@ void ASmashCharacter::SetupMappingContextInToController() const
 #pragma region Jump Actions
 	void ASmashCharacter::OnInputJump(const FInputActionValue& InputActionValue)
 	{
-	if (StateMachine && GetCharacterMovement()->IsMovingOnGround())
+	if (StateMachine && JumpIndex != MaxJump)
     	{
+			JumpIndex ++;
     	    StateMachine->ChangeState(ESmashCharacterStateID::Jump);
     	}
 	}
@@ -236,5 +247,30 @@ void ASmashCharacter::SetupMappingContextInToController() const
 		Super::Landed(Hit);
 	    GetCharacterMovement()->MaxWalkSpeed = FallHorizontalMoveSpeed;
 		GetCharacterMovement()->GravityScale = FallGravityScale;
+		JumpIndex = 0;
 	}
+
+#pragma endregion
+
+#pragma region Attack
+
+void ASmashCharacter::OnInputAttack(const FInputActionValue& InputActionValue)
+{
+	StateMachine->ChangeState(ESmashCharacterStateID::Attack);
+	InAttack = true;
+}
+
+void ASmashCharacter::EndAttack()
+{
+
+	StateMachine->ChangeState(ESmashCharacterStateID::Idle);
+	InAttack = false;
+	
+}
+
+bool ASmashCharacter::GetIsAttacking() const
+{
+	return InAttack;
+}
+
 #pragma endregion

@@ -120,6 +120,27 @@ private:
 
 	void OnInputJump(const FInputActionValue& InputActionValue);
 	
-#pragma endregion	
+	UPROPERTY(EditAnywhere)
+	int MaxJump = 1;
+
+	int JumpIndex = 0;
+
+#pragma endregion
+
+#pragma region Attack
+
+public:
+	void EndAttack();
+
+	bool GetIsAttacking() const;
+	
+private:
+	
+	void OnInputAttack(const FInputActionValue& InputActionValue);
+	
+	bool InAttack = false;
+
+	
+#pragma endregion
 };
 

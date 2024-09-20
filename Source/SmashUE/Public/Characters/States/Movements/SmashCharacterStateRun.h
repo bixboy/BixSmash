@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SmashCharacterState.h"
+#include "Characters/SmashCharacterState.h"
 #include "SmashCharacterStateRun.generated.h"
 
 
