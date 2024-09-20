@@ -12,7 +12,8 @@ ETriggerState UInputTriggerDoubleTap::UpdateState_Implementation(const UEnhanced
 	{
 		const float CurrentTime = PlayerInput->GetOuterAPlayerController()
 											 ->GetWorld()
-											 ->GetTimeSeconds();
+											 ->GetRealTimeSeconds();
+		
 		if (CurrentTime - LastTappedTime < Delay)
 		{
 			LastTappedTime = 0.f;
@@ -20,5 +21,6 @@ ETriggerState UInputTriggerDoubleTap::UpdateState_Implementation(const UEnhanced
 		}
 		LastTappedTime = CurrentTime;
 	}
+	
 	return ETriggerState::None;
 }

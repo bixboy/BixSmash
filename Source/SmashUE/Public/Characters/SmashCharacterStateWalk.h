@@ -23,4 +23,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float MoveSpeed = 250.f;
+
+	UFUNCTION()
+	void OnInputMoveXFast(float InputMoveX);
 };
