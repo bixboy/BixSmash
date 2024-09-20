@@ -13,5 +13,7 @@ enum class ESmashCharacterStateID : uint8
 	None = 0,
 	Idle,
 	Walk,
-	Run
+	Run,
+	Jump,
+	Fall
 };

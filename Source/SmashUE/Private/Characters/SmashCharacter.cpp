@@ -10,20 +10,20 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-// Sets default values
 ASmashCharacter::ASmashCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
 void ASmashCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	CreateStateMachine();
 	
 	InitStateMachine();
+
+	FallHorizontalMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	FallGravityScale = GetCharacterMovement()->GravityScale;
 }
 
 // Called every frame
@@ -47,6 +47,8 @@ void ASmashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	BindInputMoveXAxisAndActions(EnhancedInputComponent);
 }
 
+#pragma region Orient X
+
 float ASmashCharacter::GetOrientX() const
 {
 	return OrientX;
@@ -63,6 +65,10 @@ void ASmashCharacter::RotateMeshUsingOrientX() const
 	Rotation.Yaw = -90.f * OrientX;
 	GetMesh()->SetRelativeRotation(Rotation);
 }
+
+#pragma endregion
+
+#pragma region State Machine
 
 void ASmashCharacter::CreateStateMachine()
 {
@@ -81,11 +87,7 @@ void ASmashCharacter::TickStateMachine(float DeltaTime) const
 	StateMachine->Tick(DeltaTime);
 }
 
-void ASmashCharacter::Move(float Speed, float Orient)
-{
-	GetCharacterMovement()-> MaxWalkSpeed = Speed;
-	AddMovementInput(GetActorForwardVector(), Orient);
-}
+#pragma endregion
 
 void ASmashCharacter::SetupMappingContextInToController() const
 {
@@ -106,6 +108,11 @@ void ASmashCharacter::SetupMappingContextInToController() const
 		return InputMoveX;
 	}
 
+	float ASmashCharacter::GetInputMoveZ() const
+	{
+		return  InputMoveZ;
+	}
+
 	void ASmashCharacter::BindInputMoveXAxisAndActions(UEnhancedInputComponent* EnhancedInputComponent)
 	{
 		if(InputComponent == nullptr) return;
@@ -117,21 +124,21 @@ void ASmashCharacter::SetupMappingContextInToController() const
 				ETriggerEvent::Started,
 				this,
 				&ASmashCharacter::OnInputMoveX
-				);
+			);
 
-				EnhancedInputComponent->BindAction(
-					InputData->InputActionMoveX,
-					ETriggerEvent::Completed,
-					this,
-					&ASmashCharacter::OnInputMoveX
-				);
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionMoveX,
+				ETriggerEvent::Completed,
+				this,
+				&ASmashCharacter::OnInputMoveX
+			);
 			
-				EnhancedInputComponent->BindAction(
-					InputData->InputActionMoveX,
-					ETriggerEvent::Triggered,
-					this,
-					&ASmashCharacter::OnInputMoveX
-				);
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionMoveX,
+				ETriggerEvent::Triggered,
+				this,
+				&ASmashCharacter::OnInputMoveX
+			);
 		}
 
 		if (InputData->InputActionMoveXFast)
@@ -143,7 +150,43 @@ void ASmashCharacter::SetupMappingContextInToController() const
 				&ASmashCharacter::OnInputMoveXFast
 				);
 		}
+
+		if (InputData->InputActionMoveZ)
+		{
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionMoveZ,
+				ETriggerEvent::Started,
+				this,
+				&ASmashCharacter::OnInputMoveZ
+			);
+
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionMoveZ,
+				ETriggerEvent::Completed,
+				this,
+				&ASmashCharacter::OnInputMoveZ
+			);
+			
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionMoveZ,
+				ETriggerEvent::Triggered,
+				this,
+				&ASmashCharacter::OnInputMoveZ
+			);
+		}
+
+		if (InputData->InputActionJump)
+		{
+			EnhancedInputComponent->BindAction(
+				InputData->InputActionJump,
+				ETriggerEvent::Started,
+				this,
+				&ASmashCharacter::OnInputJump
+			);
+		}
 	}
+
+#pragma region MovementInput
 
 	void ASmashCharacter::OnInputMoveX(const FInputActionValue& InputActionValue)
 	{
@@ -155,3 +198,43 @@ void ASmashCharacter::SetupMappingContextInToController() const
 		InputMoveX = InputActionValue.Get<float>();
 		InputMoveXFastEvent.Broadcast(InputMoveX);
 	}
+
+	void ASmashCharacter::OnInputMoveZ(const FInputActionValue& InputActionValue)
+	{
+		InputMoveZ = InputActionValue.Get<float>();
+	}
+
+	void ASmashCharacter::Move(float Speed, float Orient)
+	{
+		GetCharacterMovement()-> MaxWalkSpeed = Speed;
+		AddMovementInput(GetActorForwardVector(), Orient);
+	}
+
+#pragma endregion
+
+#pragma region Jump Actions
+	void ASmashCharacter::OnInputJump(const FInputActionValue& InputActionValue)
+	{
+	if (StateMachine && GetCharacterMovement()->IsMovingOnGround())
+    	{
+    	    StateMachine->ChangeState(ESmashCharacterStateID::Jump);
+    	}
+	}
+
+	void ASmashCharacter::Jumping()
+	{
+		Jump();
+	}
+
+	void ASmashCharacter::Fall()
+	{
+		StopJumping();
+	}
+
+	void ASmashCharacter::Landed(const FHitResult& Hit)
+	{
+		Super::Landed(Hit);
+	    GetCharacterMovement()->MaxWalkSpeed = FallHorizontalMoveSpeed;
+		GetCharacterMovement()->GravityScale = FallGravityScale;
+	}
+#pragma endregion

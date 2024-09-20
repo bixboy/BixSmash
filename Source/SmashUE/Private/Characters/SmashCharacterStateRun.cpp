@@ -32,6 +32,10 @@ void USmashCharacterStateRun::StateTick(float DeltaTime)
 	{
 		StateMachine->ChangeState(ESmashCharacterStateID::Idle);
 	}
+	else if (Character->GetVelocity().Z < 0)
+	{
+		StateMachine->ChangeState(ESmashCharacterStateID::Fall);
+	}
 	else
 	{
 		Character->SetOrientX(Character->GetInputMoveX());

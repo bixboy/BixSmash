@@ -22,6 +22,8 @@ class SMASHUE_API ASmashCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ASmashCharacter();
+	float FallHorizontalMoveSpeed;
+	float FallGravityScale;
 
 protected:
 	// Called when the game starts or when spawned
@@ -89,12 +91,23 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInputMoveXEvent, float, InputMoveX)
 public:
 	float GetInputMoveX() const;
 
+	float GetInputMoveZ() const;
+
 	UPROPERTY()
 	FInputMoveXEvent InputMoveXFastEvent;
+
+	void Jumping();
+
+	void Fall();
+
+	void Landed(const FHitResult& Hit) override;
 
 protected:
 	UPROPERTY()
 	float InputMoveX = 0.f;
+
+	UPROPERTY()
+	float InputMoveZ = 0.f;
 
 private:
 	void BindInputMoveXAxisAndActions(UEnhancedInputComponent* EnhancedInputComponent);
@@ -102,6 +115,10 @@ private:
 	void OnInputMoveX(const FInputActionValue& InputActionValue);
 
 	void OnInputMoveXFast(const FInputActionValue& InputActionValue);
+
+	void OnInputMoveZ(const FInputActionValue& InputActionValue);
+
+	void OnInputJump(const FInputActionValue& InputActionValue);
 	
 #pragma endregion	
 };
