@@ -3,11 +3,13 @@
 
 #include "Characters/SmashCharacter.h"
 
-#include "Characters/SmashCharacterStateMachine.h"
+#include "Characters/States/SmashCharacterStateMachine.h"
 #include "EnhancedInputSubsystems.h"
 #include "Characters/SmashCharacterInputData.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interfaces/SmashCharacterHit.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 
 ASmashCharacter::ASmashCharacter()
@@ -254,23 +256,91 @@ void ASmashCharacter::SetupMappingContextInToController() const
 
 #pragma region Attack
 
+bool ASmashCharacter::GetIsAttacking() const
+{
+	return InAttack;
+}
+
 void ASmashCharacter::OnInputAttack(const FInputActionValue& InputActionValue)
 {
 	StateMachine->ChangeState(ESmashCharacterStateID::Attack);
 	InAttack = true;
+
+	HitActors.Empty();
 }
 
 void ASmashCharacter::EndAttack()
 {
-
 	StateMachine->ChangeState(ESmashCharacterStateID::Idle);
 	InAttack = false;
-	
 }
 
-bool ASmashCharacter::GetIsAttacking() const
+void ASmashCharacter::TakeDamage_Implementation(FHitResult HitResult)
 {
-	return InAttack;
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Im Hit"));
+	//Impact Sound
+
+	LaunchCharacter(FVector(KnockBackStrength, 0.f, fabs(KnockBackStrength)), true, true);
+	
+	//AnimMontage	
+}
+
+void ASmashCharacter::StartAttackTrace_Implementation()
+{
+	GetWorld()->GetTimerManager().SetTimer(
+		SpawnTraceTimerHandle,
+		this,
+		&ASmashCharacter::AttackTraceLoop,
+		0.001f,
+		true);
+}
+
+void ASmashCharacter::StopAttackTrace_Implementation()
+{
+	GetWorld()->GetTimerManager().ClearTimer(SpawnTraceTimerHandle);
+}
+
+void ASmashCharacter::AttackTraceLoop()
+{
+	if (CanHit)
+	{
+		const FVector Start = this->GetMesh()->GetSocketLocation("LeftHand");
+		const FVector End = Start + FVector(AttackRange, 0, 0);
+       
+		TArray<AActor*> ActorsToIgnore;
+		ActorsToIgnore.Add(this);
+		FHitResult HitResult;
+       
+		// Sphere Trace
+		const bool bHit = UKismetSystemLibrary::SphereTraceSingle(
+			GetWorld(),
+			Start,
+			End,
+			TraceRadius,
+			UEngineTypes::ConvertToTraceType(ECC_GameTraceChannel1),
+			false,
+			ActorsToIgnore,
+			EDrawDebugTrace::None,
+			HitResult,
+			true,
+			FLinearColor::Gray,
+			FLinearColor::Blue,
+			0.5f
+		);
+		
+		// Si quelque chose est touché
+		if (bHit && HitResult.GetActor() != nullptr)
+		{
+			AActor* HitActor = HitResult.GetActor();
+           
+			if (HitActor->Implements<USmashCharacterHit>() && !HitActors.Contains(HitActor))
+			{
+				HitActors.Add(HitActor);
+				ISmashCharacterHit::Execute_TakeDamage(HitActor,HitResult);
+				return;
+			}
+		}
+	}
 }
 
 #pragma endregion

@@ -4,7 +4,7 @@
 #include "Characters/States/Movements/SmashCharacterStateRun.h"
 
 #include "Characters/SmashCharacter.h"
-#include "Characters/SmashCharacterStateMachine.h"
+#include "Characters/States/SmashCharacterStateMachine.h"
 
 
 ESmashCharacterStateID USmashCharacterStateRun::GetStateID()

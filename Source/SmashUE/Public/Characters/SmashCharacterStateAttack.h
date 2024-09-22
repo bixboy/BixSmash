@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SmashCharacterState.h"
+#include "Characters/States/SmashCharacterState.h"
 #include "SmashCharacterStateAttack.generated.h"
 
 UCLASS(ClassGroup=(SmashCharacterState), meta=(BlueprintSpawnableComponent))
@@ -22,4 +22,5 @@ public:
 
 private:
 	float MoveSpeedAttack = 250.f;
+	float CurrentRotation = 0.f;
 };

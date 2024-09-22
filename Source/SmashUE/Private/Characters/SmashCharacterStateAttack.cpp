@@ -4,8 +4,8 @@
 #include "Characters/SmashCharacterStateAttack.h"
 
 #include "Characters/SmashCharacter.h"
-#include "Characters/SmashCharacterState.h"
-#include "Characters/SmashCharacterStateMachine.h"
+#include "Characters/States/SmashCharacterState.h"
+#include "Characters/States/SmashCharacterStateMachine.h"
 
 ESmashCharacterStateID USmashCharacterStateAttack::GetStateID()
 {
@@ -16,14 +16,14 @@ void USmashCharacterStateAttack::StateEnter(ESmashCharacterStateID PreviousState
 {
 	Super::StateEnter(PreviousStateID);
 
+	CurrentRotation = Character->GetOrientX();
+	Character->SetOrientX(CurrentRotation);
 	Character->PlayAnimMontage(AnimMontage);
-
 }
 
 void USmashCharacterStateAttack::StateExit(ESmashCharacterStateID NextStateID)
 {
 	Super::StateExit(NextStateID);
-
 }
 
 void USmashCharacterStateAttack::StateTick(float DeltaTime)
@@ -41,11 +41,6 @@ void USmashCharacterStateAttack::StateTick(float DeltaTime)
 	else if (Character->GetVelocity().Z < 0)
 	{
 		StateMachine->ChangeState(ESmashCharacterStateID::Fall);
-	}
-	else
-	{
-		Character->Move(MoveSpeedAttack, Character->GetOrientX());
-		Character->SetOrientX(Character->GetInputMoveX());
 	}
 }
 

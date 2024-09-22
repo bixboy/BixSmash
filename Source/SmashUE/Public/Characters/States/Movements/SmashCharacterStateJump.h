@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Characters/SmashCharacterState.h"
+#include "Characters/States/SmashCharacterState.h"
 #include "SmashCharacterStateJump.generated.h"
 
 
@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Jump")
 	float JumpAirControl = 1.f;
+
+private:	
+	float CurrentRotation;
 };

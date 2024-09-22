@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimMontage.h" 
 #include "GameFramework/Character.h"
+#include "Interfaces/SmashCharacterHit.h"
 #include "SmashCharacter.generated.h"
 
 struct FInputActionValue;
@@ -13,27 +14,23 @@ class UInputMappingContext;
 class USmashCharacterStateMachine;
 
 UCLASS()
-class SMASHUE_API ASmashCharacter : public ACharacter
+class SMASHUE_API ASmashCharacter : public ACharacter, public ISmashCharacterHit
 {
 	GENERATED_BODY()
 	
 #pragma region Unreal Default
 	
 public:
-	// Sets default values for this character's properties
 	ASmashCharacter();
 	float FallHorizontalMoveSpeed;
 	float FallGravityScale;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 #pragma endregion
@@ -133,13 +130,40 @@ public:
 	void EndAttack();
 
 	bool GetIsAttacking() const;
+
+	virtual void TakeDamage_Implementation(FHitResult HitResult) override;
+
+	virtual void StartAttackTrace_Implementation() override;
+
+	virtual void StopAttackTrace_Implementation() override;
+
+protected:
+	FTimerHandle SpawnTraceTimerHandle;
 	
 private:
 	
 	void OnInputAttack(const FInputActionValue& InputActionValue);
+
+	void AttackTraceLoop();
 	
 	bool InAttack = false;
 
+	bool CanHit = true;
+
+	UPROPERTY(EditAnywhere)
+	FName StartTrace;
+
+	UPROPERTY(EditAnywhere)
+	float AttackRange = 10.f;
+
+	UPROPERTY(EditAnywhere)
+	float TraceRadius = 20.f;
+	
+	UPROPERTY(EditAnywhere)
+	float KnockBackStrength = 100000.f;
+
+	UPROPERTY()
+	TArray<AActor*> HitActors;
 	
 #pragma endregion
 };

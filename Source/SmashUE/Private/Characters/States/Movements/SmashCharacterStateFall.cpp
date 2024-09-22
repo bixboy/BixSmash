@@ -4,8 +4,8 @@
 #include "Characters/States/Movements/SmashCharacterStateFall.h"
 
 #include "Characters/SmashCharacter.h"
-#include "Characters/SmashCharacterState.h"
-#include "Characters/SmashCharacterStateMachine.h"
+#include "Characters/States/SmashCharacterState.h"
+#include "Characters/States/SmashCharacterStateMachine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 

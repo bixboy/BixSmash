@@ -4,8 +4,8 @@
 #include "Characters/States/Movements/SmashCharacterStateIdle.h"
 
 #include "Characters/SmashCharacter.h"
-#include "Characters/SmashCharacterState.h"
-#include "Characters/SmashCharacterStateMachine.h"
+#include "Characters/States/SmashCharacterState.h"
+#include "Characters/States/SmashCharacterStateMachine.h"
 
 
 ESmashCharacterStateID USmashCharacterStateIdle::GetStateID()
@@ -36,6 +36,11 @@ void USmashCharacterStateIdle::StateTick(float DeltaTime)
 	if (FMath::Abs(Character->GetInputMoveX()) > USmashCharacterState::GetInputThreshold())
 	{
 		StateMachine->ChangeState(ESmashCharacterStateID::Walk);
+	}
+	else if (FMath::Abs(Character->GetInputMoveZ()) > USmashCharacterState::GetInputThreshold() &&
+		FMath::Abs(Character->GetInputMoveX()) < USmashCharacterState::GetInputThreshold())
+	{
+		StateMachine->ChangeState(ESmashCharacterStateID::Crouch);
 	}
 	else if (Character->GetVelocity().Z < 0)
 	{

@@ -4,8 +4,8 @@
 #include "Characters/States/Movements/SmashCharacterStateJump.h"
 
 #include "Characters/SmashCharacter.h"
-#include "Characters/SmashCharacterState.h"
-#include "Characters/SmashCharacterStateMachine.h"
+#include "Characters/States/SmashCharacterState.h"
+#include "Characters/States/SmashCharacterStateMachine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -17,6 +17,9 @@ ESmashCharacterStateID USmashCharacterStateJump::GetStateID()
 void USmashCharacterStateJump::StateEnter(ESmashCharacterStateID PreviousStateID)
 {
 	Super::StateEnter(PreviousStateID);
+
+	CurrentRotation = Character->GetOrientX();
+	Character->SetOrientX(CurrentRotation);
 
 	Character->PlayAnimMontage(AnimMontage);
 	Character->GetCharacterMovement()->MaxWalkSpeed = JumpWalkSpeed;
