@@ -150,6 +150,8 @@ private:
 
 	bool CanHit = true;
 
+	int HitCount = 1;
+
 	UPROPERTY(EditAnywhere)
 	FName StartTrace;
 
@@ -160,7 +162,10 @@ private:
 	float TraceRadius = 20.f;
 	
 	UPROPERTY(EditAnywhere)
-	float KnockBackStrength = 100000.f;
+	float KnockBackStrengthBase = 8000.f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> HitEffect = AActor::StaticClass();
 
 	UPROPERTY()
 	TArray<AActor*> HitActors;
