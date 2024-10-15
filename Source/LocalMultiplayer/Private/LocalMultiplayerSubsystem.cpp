@@ -1,4 +1,4 @@
-﻿#include "LocalMultiplayerSubsystem.h"
+#include "LocalMultiplayerSubsystem.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "LocalMultiplayerSettings.h"

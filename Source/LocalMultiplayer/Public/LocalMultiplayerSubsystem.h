@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "LocalMultiplayerSettings.h"
 #include "LocalMultiplayerSubsystem.generated.h"
 
