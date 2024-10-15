@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Characters/SmashCharacterInputData.h"
 #include "EnhancedInputComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/SmashCharacterHit.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -277,12 +278,20 @@ void ASmashCharacter::EndAttack()
 
 void ASmashCharacter::TakeDamage_Implementation(FHitResult HitResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Im Hit"));
 	//Impact Sound
 
-	LaunchCharacter(FVector(KnockBackStrength, 0.f, fabs(KnockBackStrength)), true, true);
+	FVector KnockBackDirection = FVector(-HitResult.Normal.GetSafeNormal().X, 0.f, -HitResult.Normal.GetSafeNormal().Y);
+
+	HitCount++;
+	float KnockBackStrength = KnockBackStrengthBase * HitCount;
+	FVector KnockBackImpulse = FVector(KnockBackDirection.X * KnockBackStrength, 0.f, (KnockBackDirection.X * KnockBackStrength)*2);
+
+	 this->Fall();
+	LaunchCharacter(FVector(KnockBackStrength, 0.f, fabs(KnockBackStrength)), false, false);
+	//GetCapsuleComponent()->AddImpulse(KnockBackImpulse);
 	
-	//AnimMontage	
+	StateMachine->ChangeState(ESmashCharacterStateID::Hit);
+	
 }
 
 void ASmashCharacter::StartAttackTrace_Implementation()
@@ -337,6 +346,7 @@ void ASmashCharacter::AttackTraceLoop()
 			{
 				HitActors.Add(HitActor);
 				ISmashCharacterHit::Execute_TakeDamage(HitActor,HitResult);
+				//GetWorld()->SpawnActor<AActor>(MyActorClass, FTransform(HitResult.Normal));
 				return;
 			}
 		}
