@@ -12,6 +12,9 @@ void ULocalMultiplayerGameViewportClient::PostInitProperties()
 bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& EventArgs)
 {
 	ULocalMultiplayersSubsystem* subsystem = GetMutableDefault<ULocalMultiplayersSubsystem>();
+	if (!subsystem)
+		return Super::InputKey(EventArgs);
+	
 	if (EventArgs.Key.IsGamepadKey())
 	{
 		int PlayerIndex = subsystem->GetAssignedPlayerIndexFromGamepadDeviceID(EventArgs.ControllerId);
@@ -24,8 +27,11 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
 	}
 	else if (EventArgs.Key.IsValid())
 	{
-		// Traitement pour une touche du clavier
-		const int KeyboardProfileIndex = GetDefault<ULocalMultiplayerSettings>()->FindKeyboardProfileIndexFromKey(EventArgs.Key, ELocalMultiplayerInputMappingType::InGame);
+		ULocalMultiplayerSettings* Settings = GetMutableDefault<ULocalMultiplayerSettings>();
+		if (!Settings)
+			return Super::InputKey(EventArgs);
+
+		const int KeyboardProfileIndex = Settings->FindKeyboardProfileIndexFromKey(EventArgs.Key, ELocalMultiplayerInputMappingType::InGame);
 		if (KeyboardProfileIndex != -1)
 		{
 			int PlayerIndex = subsystem->GetAssignedPlayerIndexFromKeyProfileIndex(KeyboardProfileIndex);
@@ -35,18 +41,18 @@ bool ULocalMultiplayerGameViewportClient::InputKey(const FInputKeyEventArgs& Eve
 			}
 			
 			subsystem->AssignKeyboardMapping(PlayerIndex, KeyboardProfileIndex, ELocalMultiplayerInputMappingType::InGame);
-			FString DebugMessage = FString::Printf(TEXT("Key pressed: %s"), *EventArgs.Key.ToString());
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DebugMessage);
 		}
 	}
 
 	return Super::InputKey(EventArgs);
 }
 
-bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInputDeviceId InputDevice, FKey Key,
-	float Delta, float DeltaTime, int32 NumSamples, bool bGamepad)
+bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInputDeviceId InputDevice, FKey Key, float Delta, float DeltaTime, int32 NumSamples, bool bGamepad)
 {
 	ULocalMultiplayersSubsystem* subsystem = GetMutableDefault<ULocalMultiplayersSubsystem>();
+	if (!subsystem)
+		return Super::InputAxis(InViewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad);
+	
 	if (bGamepad)
 	{
 		int PlayerIndex = subsystem->GetAssignedPlayerIndexFromGamepadDeviceID(InputDevice.GetId());
@@ -56,7 +62,6 @@ bool ULocalMultiplayerGameViewportClient::InputAxis(FViewport* InViewport, FInpu
 		}
 
 		subsystem->AssignGamepadInputMapping(PlayerIndex, ELocalMultiplayerInputMappingType::InGame);
-
 		
 		ULocalPlayer* LocalPlayer = GetGameInstance()->GetLocalPlayerByIndex(PlayerIndex);
 		if (LocalPlayer && LocalPlayer->PlayerController)

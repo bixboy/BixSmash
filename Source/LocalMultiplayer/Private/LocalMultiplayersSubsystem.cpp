@@ -16,15 +16,25 @@ void ULocalMultiplayersSubsystem::CreatAndInitPlayers(ELocalMultiplayerInputMapp
 
 int ULocalMultiplayersSubsystem::GetAssignedPlayerIndexFromKeyProfileIndex(int KeyboardProfileIndex) const
 {
-    for (int32 PlayerIndex = 0; PlayerIndex < GetGameInstance()->GetNumLocalPlayers(); ++PlayerIndex)
-    {
-        ULocalPlayer* LocalPlayer = GetGameInstance()->GetLocalPlayerByIndex(PlayerIndex);
-        if (LocalPlayer && LocalPlayer->PlayerController)
-        {
-            return PlayerIndex;
-        }
-    }
-    return -1;
+	const ULocalMultiplayerSettings* Settings = GetMutableDefault<ULocalMultiplayerSettings>();
+    
+	const int32 NbKeyboardProfiles = Settings->GetNbKeyboardProfiles();
+	if (KeyboardProfileIndex < 0 || KeyboardProfileIndex >= NbKeyboardProfiles)
+	{
+		return -1;
+	}
+
+	for (int32 PlayerIndex = 0; PlayerIndex < Settings->GetNbKeyboardProfiles(); ++PlayerIndex)
+	{
+		const FLocalMultiplayerProfileData& PlayerProfileData = Settings->KeyboardProfilesData[PlayerIndex];
+
+		if (PlayerProfileData.ContainsKey(Settings->KeyboardProfilesData[KeyboardProfileIndex].ProfileName, ELocalMultiplayerInputMappingType::InGame))
+		{
+			return PlayerIndex;
+		}
+	}
+
+	return -1;
 }
 
 int ULocalMultiplayersSubsystem::AssignNewPlayerToKeyboardProfile(int KeyboardProfileIndex)
@@ -36,12 +46,12 @@ int ULocalMultiplayersSubsystem::AssignNewPlayerToKeyboardProfile(int KeyboardPr
 
 void ULocalMultiplayersSubsystem::AssignKeyboardMapping(int PlayerIndex, int KeyboardProfileIndex, ELocalMultiplayerInputMappingType MappingType) const
 {
-	if (PlayerIndex < 0 || PlayerIndex >= GetGameInstance()->GetNumLocalPlayers())
+	const ULocalMultiplayerSettings* Settings = GetMutableDefault<ULocalMultiplayerSettings>();
+	if (PlayerIndex < 0 || PlayerIndex >= Settings->GetNbKeyboardProfiles())
 	{
 		return;
 	}
-
-	const ULocalMultiplayerSettings* Settings = GetDefault<ULocalMultiplayerSettings>();
+	
 	if (!Settings)
 	{
 		return;
@@ -58,9 +68,16 @@ void ULocalMultiplayersSubsystem::AssignKeyboardMapping(int PlayerIndex, int Key
 		return;
 	}
 
-	ULocalPlayer* LocalPlayer = GetGameInstance()->GetLocalPlayerByIndex(PlayerIndex);
+	if (PlayerIndex < 0 || PlayerIndex >= Settings->GetNbKeyboardProfiles())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Invalid PlayerIndex: %d"), PlayerIndex);
+		return;
+	}
+
+	ULocalPlayer* LocalPlayer = GameInstance->GetLocalPlayerByIndex(PlayerIndex);
 	if (!LocalPlayer || !LocalPlayer->PlayerController)
 	{
+		UE_LOG(LogTemp, Error, TEXT("LocalPlayer or PlayerController is null for PlayerIndex: %d"), PlayerIndex);
 		return;
 	}
 

@@ -3,9 +3,11 @@
 bool FLocalMultiplayerProfileData::ContainsKey(const FKey& Key,
 	ELocalMultiplayerInputMappingType InputMappingType) const
 {
-	if (IMCInGame)
+	const UInputMappingContext* MappingContext = GetIMCFromType(InputMappingType);
+
+	if (MappingContext)
 	{
-		for (const FEnhancedActionKeyMapping& Mapping : IMCInGame->GetMappings())
+		for (const FEnhancedActionKeyMapping& Mapping : MappingContext->GetMappings())
 		{
 			if (Mapping.Key == Key)
 			{
@@ -13,6 +15,7 @@ bool FLocalMultiplayerProfileData::ContainsKey(const FKey& Key,
 			}
 		}
 	}
+
 	return false;
 }
 
@@ -42,16 +45,15 @@ int ULocalMultiplayerSettings::FindKeyboardProfileIndexFromKey(const FKey& Key,
 		const FLocalMultiplayerProfileData& ProfileData = KeyboardProfilesData[Index];
 
 		const UInputMappingContext* IMC = ProfileData.GetIMCFromType(MappingType);
-		if (!IMC)
-		{
-			continue;
-		}
 
-		for (const FEnhancedActionKeyMapping& Mapping : IMC->GetMappings())
+		if (IMC)
 		{
-			if (Mapping.Key == Key)
+			for (const FEnhancedActionKeyMapping& Mapping : IMC->GetMappings())
 			{
-				return Index;
+				if (Mapping.Key == Key)
+				{
+					return Index;
+				}
 			}
 		}
 	}
