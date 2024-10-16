@@ -9,7 +9,10 @@ public class LocalMultiplayer : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "Core", "EnhancedInput","DeveloperSettings"
+                "Core", 
+                "EnhancedInput",
+                "DeveloperSettings",
+                "InputCore"
             }
         );
 

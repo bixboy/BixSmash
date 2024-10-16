@@ -1,17 +1,26 @@
-#pragma once
-#include "LocalMultiplayerSettings.h"
-#include "LocalMultiplayerSubsystem.generated.h"
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Subsystems/GameInstanceSubsystem.h"
+#include "LocalMultiplayerSettings.h"
+
+#include "LocalMultiplayersSubsystem.generated.h"
+
+/**
+ * 
+ */
 UCLASS()
-class LOCALMULTIPLAYER_API ULocalMultiplayerSubsystem : public UGameInstanceSubsystem
+class LOCALMULTIPLAYER_API ULocalMultiplayersSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
-	
+
 public:
 	UFUNCTION(BlueprintCallable)
 	void CreatAndInitPlayers(ELocalMultiplayerInputMappingType MappingType);
 
-	int GetAssignedPlayerIndexFromKeyProfileIndex(int KeyboardProfileIndex);
+	int GetAssignedPlayerIndexFromKeyProfileIndex(int KeyboardProfileIndex) const;
 
 	int AssignNewPlayerToKeyboardProfile(int KeyboardProfileIndex);
 

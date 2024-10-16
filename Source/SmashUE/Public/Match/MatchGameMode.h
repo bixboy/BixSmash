@@ -34,6 +34,8 @@ class SMASHUE_API AMatchGameMode : public AGameModeBase
 		void FindPlayerStartActorsInArena(TArray<AArenaPlayerStart*>& ResultsActors);
 
 		void SpawnCharacters(const TArray<AArenaPlayerStart*>& SpawnPoints);
+
+		void CreateAndInitPlayers() const;
 	
 		TSubclassOf<ASmashCharacter> GetSmashCharacterClassFromInputType(EAutoReceiveInput::Type InputType) const;
 };

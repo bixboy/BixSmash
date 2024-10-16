@@ -1,39 +1,40 @@
-#include "LocalMultiplayerSubsystem.h"
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+#include "LocalMultiplayersSubsystem.h"
 #include "EnhancedInputSubsystems.h"
 #include "LocalMultiplayerSettings.h"
 
-void ULocalMultiplayerSubsystem::CreatAndInitPlayers(ELocalMultiplayerInputMappingType MappingType)
+void ULocalMultiplayersSubsystem::CreatAndInitPlayers(ELocalMultiplayerInputMappingType MappingType)
 {
-	ULocalMultiplayerSettings* Settings = GetMutableDefault<ULocalMultiplayerSettings>();
-	for (int32 i = 0; i < Settings->GetNbKeyboardProfiles(); ++i)
-	{
-		FString Error;
-		GetGameInstance()->CreateLocalPlayer(i, Error, true);
-	}
+    ULocalMultiplayerSettings* Settings = GetMutableDefault<ULocalMultiplayerSettings>();
+    for (int32 i = 0; i < Settings->GetNbKeyboardProfiles(); ++i)
+    {
+        FString Error;
+        GetGameInstance()->CreateLocalPlayer(i, Error, true);
+    }
 }
 
-int ULocalMultiplayerSubsystem::GetAssignedPlayerIndexFromKeyProfileIndex(int KeyboardProfileIndex)
+int ULocalMultiplayersSubsystem::GetAssignedPlayerIndexFromKeyProfileIndex(int KeyboardProfileIndex) const
 {
-	for (int32 PlayerIndex = 0; PlayerIndex < GetGameInstance()->GetNumLocalPlayers(); ++PlayerIndex)
-	{
-		ULocalPlayer* LocalPlayer = GetGameInstance()->GetLocalPlayerByIndex(PlayerIndex);
-		if (LocalPlayer && LocalPlayer->PlayerController)
-		{
-			return PlayerIndex;
-		}
-	}
-	return -1;
+    for (int32 PlayerIndex = 0; PlayerIndex < GetGameInstance()->GetNumLocalPlayers(); ++PlayerIndex)
+    {
+        ULocalPlayer* LocalPlayer = GetGameInstance()->GetLocalPlayerByIndex(PlayerIndex);
+        if (LocalPlayer && LocalPlayer->PlayerController)
+        {
+            return PlayerIndex;
+        }
+    }
+    return -1;
 }
 
-int ULocalMultiplayerSubsystem::AssignNewPlayerToKeyboardProfile(int KeyboardProfileIndex)
+int ULocalMultiplayersSubsystem::AssignNewPlayerToKeyboardProfile(int KeyboardProfileIndex)
 {
 	PlayerIndexFromKeyboardProfileIndex.Add(KeyboardProfileIndex, LastAssignedPlayerIndex);
 	LastAssignedPlayerIndex++;
-	return  PlayerIndexFromGamepadProfileIndex[KeyboardProfileIndex];
+	return  PlayerIndexFromKeyboardProfileIndex[KeyboardProfileIndex];
 }
 
-void ULocalMultiplayerSubsystem::AssignKeyboardMapping(int PlayerIndex, int KeyboardProfileIndex, ELocalMultiplayerInputMappingType MappingType) const
+void ULocalMultiplayersSubsystem::AssignKeyboardMapping(int PlayerIndex, int KeyboardProfileIndex, ELocalMultiplayerInputMappingType MappingType) const
 {
 	if (PlayerIndex < 0 || PlayerIndex >= GetGameInstance()->GetNumLocalPlayers())
 	{
@@ -70,7 +71,7 @@ void ULocalMultiplayerSubsystem::AssignKeyboardMapping(int PlayerIndex, int Keyb
 	}
 }
 
-int ULocalMultiplayerSubsystem::GetAssignedPlayerIndexFromGamepadDeviceID(int DeviceID)
+int ULocalMultiplayersSubsystem::GetAssignedPlayerIndexFromGamepadDeviceID(int DeviceID)
 {
 	if (PlayerIndexFromGamepadProfileIndex.Contains(DeviceID))
 	{
@@ -80,7 +81,7 @@ int ULocalMultiplayerSubsystem::GetAssignedPlayerIndexFromGamepadDeviceID(int De
 	return -1;
 }
 
-int ULocalMultiplayerSubsystem::AssignNewPlayerToGamepadDeviceID(int GamepadDeviceID)
+int ULocalMultiplayersSubsystem::AssignNewPlayerToGamepadDeviceID(int GamepadDeviceID)
 {
 	if (GamepadDeviceID < 0)
 	{
@@ -92,7 +93,7 @@ int ULocalMultiplayerSubsystem::AssignNewPlayerToGamepadDeviceID(int GamepadDevi
 	return LastAssignedPlayerIndex - 1;
 }
 
-void ULocalMultiplayerSubsystem::AssignGamepadInputMapping(int PlayerIndex,
+void ULocalMultiplayersSubsystem::AssignGamepadInputMapping(int PlayerIndex,
 	ELocalMultiplayerInputMappingType MappingType) const
 {
 	if (PlayerIndex < 0 || PlayerIndex >= GetGameInstance()->GetNumLocalPlayers())
@@ -119,3 +120,4 @@ void ULocalMultiplayerSubsystem::AssignGamepadInputMapping(int PlayerIndex,
 		InputSubsystem->AddMappingContext(Settings->GamepadeProfileData.GetIMCFromType(MappingType), 0);
 	}
 }
+

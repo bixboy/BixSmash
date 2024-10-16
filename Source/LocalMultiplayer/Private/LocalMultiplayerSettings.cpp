@@ -1,15 +1,16 @@
 ﻿#include "LocalMultiplayerSettings.h"
 
-#include "../../../../../Versions/UE_5.3/Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/InputMappingContext.h"
-
 bool FLocalMultiplayerProfileData::ContainsKey(const FKey& Key,
 	ELocalMultiplayerInputMappingType InputMappingType) const
 {
-	for (const FEnhancedActionKeyMapping& Mapping : IMCInGame->GetMappings())
+	if (IMCInGame)
 	{
-		if (Mapping.Key == Key)
+		for (const FEnhancedActionKeyMapping& Mapping : IMCInGame->GetMappings())
 		{
-			return true;
+			if (Mapping.Key == Key)
+			{
+				return true;
+			}
 		}
 	}
 	return false;
@@ -23,8 +24,9 @@ UInputMappingContext* FLocalMultiplayerProfileData::GetIMCFromType(ELocalMultipl
 		return IMCInGame;
 	case ELocalMultiplayerInputMappingType::Menu:
 		return IMCMenu;
+	default:
+		return nullptr;
 	}
-	return nullptr;
 }
 
 int ULocalMultiplayerSettings::GetNbKeyboardProfiles() const
